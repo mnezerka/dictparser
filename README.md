@@ -1,0 +1,2 @@
+# dictparser
+Dictionary parser

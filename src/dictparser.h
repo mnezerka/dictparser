@@ -47,7 +47,6 @@ struct dictparser_roundtripper {
     struct dictparser_callbacks funcs;
     void *opaque;
     char *scratch;
-    int code;
     int parsestate;
     int state;
     int nscratch;
@@ -57,14 +56,11 @@ struct dictparser_roundtripper {
 
 enum dictparser_pair_status
 {
-    dictparser_pair_status_done,
-    dictparser_pair_status_continue,
-    dictparser_pair_status_version_character,
-    dictparser_pair_status_code_character,
-    dictparser_pair_status_status_character,
-    dictparser_pair_status_key_character,
-    dictparser_pair_status_value_character,
-    dictparser_pair_status_store_keyvalue
+    dictparser_status_continue,
+    dictparser_status_key_character,
+    dictparser_status_value_character,
+    dictparser_status_store_keyvalue,
+    dictparser_status_error
 };
 
 /**
@@ -76,7 +72,7 @@ void dictparser_init(struct dictparser_roundtripper* rt, struct dictparser_callb
 /**
  * Frees any scratch memory allocated during parsing.
  */
-void dictparsser_free(struct dictparser_roundtripper* rt);
+void dictparser_free(struct dictparser_roundtripper* rt);
 
 /**
  * Parses a block of raw data. Returns zero if the parser reached the
@@ -84,15 +80,13 @@ void dictparsser_free(struct dictparser_roundtripper* rt);
  * for the presence of an error. Returns non-zero if more data is required for
  * the response.
  */
-int dictparser_data(struct dictparser_roundtripper* rt, const char* data, int size, int* read);
+int dictparser_data(struct dictparser_roundtripper* rt, const char* data, int size);
 
 /**
  * Returns non-zero if a completed parser encounted an error. If dictparser_data did
  * not return non-zero, the results of this function are undefined.
  */
-int dictparser_iserror(struct http_roundtripper* rt);
-
-
+int dictparser_iserror(struct dictparser_roundtripper* rt);
 
 /**
  * Parses a single character of an HTTP header stream. The state parameter is
